@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum MovieRating {
+  U
+  UA
+  A
+}
+
+enum SeatStatus {
+  AVAILABLE
+  HELD
+  BOOKED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(CUSTOMER)
+  createdAt    DateTime  @default(now())
+  bookings     Booking[]
+  heldSeats    Seat[]    @relation("SeatHeldBy")
+
+  @@map("users")
+}
+
+model Movie {
+  id              String      @id @default(uuid())
+  title           String
+  posterUrl       String
+  language        String
+  durationMinutes Int
+  rating          MovieRating
+  description     String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  shows           Show[]
+
+  @@map("movies")
+}
+
+model Show {
+  id        String    @id @default(uuid())
+  movie     Movie     @relation(fields: [movieId], references: [id], onDelete: Restrict)
+  movieId   String
+  startAt   DateTime
+  endAt     DateTime
+  price     Decimal   @db.Decimal(10, 2)
+  createdAt DateTime  @default(now())
+  seats     Seat[]
+  bookings  Booking[]
+
+  @@index([movieId])
+  @@index([startAt])
+  @@map("shows")
+}
+
+model Seat {
+  id           String        @id @default(uuid())
+  show         Show          @relation(fields: [showId], references: [id], onDelete: Cascade)
+  showId       String
+  rowLabel     String
+  seatNumber   Int
+  status       SeatStatus    @default(AVAILABLE)
+  heldBy       User?         @relation("SeatHeldBy", fields: [heldById], references: [id], onDelete: SetNull)
+  heldById     String?
+  heldUntil    DateTime?
+  bookingSeats BookingSeat[]
+
+  @@unique([showId, rowLabel, seatNumber])
+  @@index([showId, status])
+  @@index([heldById])
+  @@map("seats")
+}
+
+model Booking {
+  id          String        @id @default(uuid())
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  show        Show          @relation(fields: [showId], references: [id], onDelete: Restrict)
+  showId      String
+  totalAmount Decimal       @db.Decimal(10, 2)
+  status      BookingStatus @default(CONFIRMED)
+  createdAt   DateTime      @default(now())
+  cancelledAt DateTime?
+  seats       BookingSeat[]
+
+  @@index([userId])
+  @@index([showId])
+  @@map("bookings")
+}
+
+model BookingSeat {
+  id         String  @id @default(uuid())
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId  String
+  seat       Seat    @relation(fields: [seatId], references: [id], onDelete: Restrict)
+  seatId     String
+  rowLabel   String
+  seatNumber Int
+
+  @@index([seatId])
+  @@map("booking_seats")
+}
