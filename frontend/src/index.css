@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --color-brand-50: #fff1f3;
+  --color-brand-100: #ffe1e6;
+  --color-brand-200: #ffc7d1;
+  --color-brand-300: #ff9cad;
+  --color-brand-400: #fc6680;
+  --color-brand-500: #f84464;
+  --color-brand-600: #e51f49;
+  --color-brand-700: #c1123a;
+  --color-brand-800: #a01236;
+  --color-brand-900: #861333;
+
+  --color-ink-50: #f6f7f9;
+  --color-ink-100: #eceef2;
+  --color-ink-200: #d7dbe3;
+  --color-ink-300: #b3bac8;
+  --color-ink-400: #8992a6;
+  --color-ink-500: #69718a;
+  --color-ink-600: #535a71;
+  --color-ink-700: #40465a;
+  --color-ink-800: #262b3a;
+  --color-ink-900: #14161f;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-ink-50);
+  color: var(--color-ink-900);
+}
+
+::selection {
+  background-color: var(--color-brand-200);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--color-ink-300);
+  border-radius: 9999px;
+}
